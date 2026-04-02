@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darshan Pass — Ganesh Festival ECS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .pass-hero {
+            background: linear-gradient(145deg, #1a0533, #4a0072, #8B0000);
+            padding: 60px 24px;
+            text-align: center;
+            color: white;
+        }
+        .pass-hero h1 { color: var(--gold-light); font-size: 2.5rem; margin-bottom: 10px; }
+        .pass-hero p  { color: rgba(255,255,255,0.8); }
+
+        .pass-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 32px;
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .slot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .slot-btn {
+            padding: 14px 8px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition);
+        }
+        .slot-btn:hover, .slot-btn.selected {
+            border-color: var(--maroon);
+            background: #FFF0E0;
+        }
+        .slot-btn .slot-icon  { font-size: 1.5rem; display: block; margin-bottom: 4px; }
+        .slot-btn .slot-label { font-size: 0.78rem; font-weight: 700; color: var(--maroon); display: block; }
+        .slot-btn .slot-time  { font-size: 0.7rem; color: var(--text-light); display: block; margin-top: 2px; }
+
+        /* The actual pass card */
+        .pass-card {
+            background: linear-gradient(135deg, #4a0072 0%, #8B0000 50%, #FF6B00 100%);
+            border-radius: 16px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        .pass-card::before {
+            content: 'ॐ';
+            position: absolute;
+            font-size: 10rem;
+            right: -20px;
+            top: -20px;
+            opacity: 0.08;
+            font-family: 'Yatra One', cursive;
+        }
+        .pass-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .pass-card-title { font-family: 'Yatra One', cursive; font-size: 1.1rem; color: var(--gold-light); }
+        .pass-card-subtitle { font-size: 0.72rem; opacity: 0.8; margin-top: 2px; }
+        .pass-number-badge {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--gold-light);
+            letter-spacing: 0.05em;
+        }
+        .pass-divider {
+            border: none;
+            border-top: 1px dashed rgba(255,255,255,0.3);
+            margin: 14px 0;
+        }
+        .pass-detail { margin-bottom: 8px; }
+        .pass-detail-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.7; }
+        .pass-detail-value { font-size: 0.95rem; font-weight: 600; }
+        .pass-qr-box {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            margin-top: 14px;
+        }
+        .pass-qr-canvas { display: block; margin: 0 auto; }
+        .pass-qr-text { font-size: 0.72rem; color: var(--maroon); margin-top: 6px; font-weight: 700; font-family: monospace; }
+        .pass-status-active   { background: #27AE60; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+        .pass-status-used     { background: #888; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; }
+        .pass-status-cancelled{ background: var(--red); color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; }
+
+        /* Lookup form */
+        .lookup-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+        .lookup-header {
+            background: linear-gradient(135deg, #4a0072, #8B0000);
+            color: white;
+            padding: 14px 18px;
+        }
+        .lookup-header h3 { color: var(--gold-light); font-size: 0.95rem; }
+
+        @media print {
+            nav, footer, .pass-layout > *:not(.pass-card), .btn, .page-header { display: none !important; }
+            .pass-card { box-shadow: none; max-width: 400px; margin: 0 auto; }
+        }
+
+        @media (max-width: 768px) {
+            .pass-layout { grid-template-columns: 1fr; }
+            .slot-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand"><span class="om">ॐ</span> Ganesh Festival ECS</a>
+        <div class="nav-toggle"><span></span><span></span><span></span></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="mandals.html">Mandals</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="donate.html">Donate</a></li>
+            <li><a href="donations.html">Donations</a></li>
+            <li><a href="passes.html">Passes</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="contact_us.html">Contact us</a></li>
+        </ul>
+        <div class="nav-auth">
+            <div id="nav-guest" style="display:none">
+                <button class="btn-nav-login" onclick="location.href='login.html'">Login</button>
+                <button class="btn-nav-register" onclick="location.href='register.html'">Register</button>
+            </div>
+            <div id="nav-user-info" style="display:none">
+                <span id="nav-username"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button id="btn-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="pass-hero">
+    <span style="font-size:3.5rem;display:block;margin-bottom:12px">🎟️</span>
+    <h1>Ganapati Darshan Pass</h1>
+    <p>Book your free darshan pass and skip the queue.<br>
+       Show this pass at the mandal entrance for priority darshan.</p>
+</div>
+
+<div class="pass-layout">
+    <!-- Booking Form -->
+    <div>
+        <div class="section-panel" id="booking-section">
+            <div class="section-panel-header">
+                <h3>📋 Book Your Darshan Pass</h3>
+                <span style="font-size:0.78rem;color:rgba(255,255,255,0.7)">Free · No login required</span>
+            </div>
+            <div class="section-panel-body">
+                <div id="alert-container"></div>
+                <div id="booking-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="pass-name" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" id="pass-email" placeholder="you@example.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="pass-phone" placeholder="9876543210">
+                        </div>
+                        <div class="form-group">
+                            <label>Number of People *</label>
+                            <select id="pass-people">
+                                <option value="1">1 Person</option>
+                                <option value="2">2 People</option>
+                                <option value="3">3 People</option>
+                                <option value="4">4 People</option>
+                                <option value="5">5 People</option>
+                                <option value="6">6 People</option>
+                                <option value="7">7 People</option>
+                                <option value="8">8 People</option>
+                                <option value="9">9 People</option>
+                                <option value="10">10 People</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Select Mandal *</label>
+                            <select id="pass-mandal"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Darshan Date *</label>
+                            <input type="date" id="pass-date" min="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Select Time Slot *</label>
+                        <div class="slot-grid">
+                            <div class="slot-btn selected" data-slot="Morning" onclick="selectSlot(this)">
+                                <span class="slot-icon">🌅</span>
+                                <span class="slot-label">Morning</span>
+                                <span class="slot-time">6AM – 10AM</span>
+                            </div>
+                            <div class="slot-btn" data-slot="Afternoon" onclick="selectSlot(this)">
+                                <span class="slot-icon">☀️</span>
+                                <span class="slot-label">Afternoon</span>
+                                <span class="slot-time">11AM – 3PM</span>
+                            </div>
+                            <div class="slot-btn" data-slot="Evening" onclick="selectSlot(this)">
+                                <span class="slot-icon">🌆</span>
+                                <span class="slot-label">Evening</span>
+                                <span class="slot-time">5PM – 9PM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem" onclick="bookPass()" id="btn-book">
+                        🎟️ Book Free Darshan Pass
+                    </button>
+                </div>
+
+                <!-- Pass Display after booking -->
+                <div id="pass-display" style="display:none"></div>
+            </div>
+        </div>
+
+        <!-- Lookup Section -->
+        <div class="lookup-card" style="margin-top:24px">
+            <div class="lookup-header"><h3>🔍 Find Your Pass</h3></div>
+            <div style="padding:18px">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="lookup-email" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>OR Pass Number</label>
+                        <input type="text" id="lookup-passno" placeholder="GFECS-2024-00001">
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="lookupPass()">🔍 Find Pass</button>
+                <div id="lookup-results" style="margin-top:16px"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info sidebar -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+        <!-- How it works -->
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border);padding:20px;box-shadow:0 2px 12px var(--shadow)">
+            <h3 style="color:var(--maroon);margin-bottom:16px">📖 How It Works</h3>
+            <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:var(--saffron);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;flex-shrink:0">1</div>
+                    <div><strong style="font-size:0.88rem">Fill the form</strong><br><span style="font-size:0.78rem;color:var(--text-light)">Enter your details and preferred slot</span></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:var(--saffron);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;flex-shrink:0">2</div>
+                    <div><strong style="font-size:0.88rem">Get your pass instantly</strong><br><span style="font-size:0.78rem;color:var(--text-light)">A digital pass is generated with a unique ID</span></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:var(--saffron);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;flex-shrink:0">3</div>
+                    <div><strong style="font-size:0.88rem">Print or screenshot</strong><br><span style="font-size:0.78rem;color:var(--text-light)">Save or print your pass</span></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:var(--saffron);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.82rem;flex-shrink:0">4</div>
+                    <div><strong style="font-size:0.88rem">Show at entrance</strong><br><span style="font-size:0.78rem;color:var(--text-light)">Get priority darshan at the mandal</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules -->
+        <div style="background:#FFF8ED;border-radius:var(--radius);border:1px solid var(--gold);padding:20px">
+            <h3 style="color:var(--maroon);margin-bottom:12px;font-size:0.95rem">📌 Pass Rules</h3>
+            <ul style="display:flex;flex-direction:column;gap:8px">
+                <li style="font-size:0.82rem;color:var(--text-mid);display:flex;gap:6px"><span>✅</span>Pass is FREE of cost</li>
+                <li style="font-size:0.82rem;color:var(--text-mid);display:flex;gap:6px"><span>✅</span>Valid only on the selected date and slot</li>
+                <li style="font-size:0.82rem;color:var(--text-mid);display:flex;gap:6px"><span>✅</span>Max 10 people per booking</li>
+                <li style="font-size:0.82rem;color:var(--text-mid);display:flex;gap:6px"><span>✅</span>Show pass at mandal entrance</li>
+                <li style="font-size:0.82rem;color:var(--text-mid);display:flex;gap:6px"><span>❌</span>Non-transferable</li>
+                <li style="font-size:0.82rem;color:var(--text-mid);display:flex;gap:6px"><span>❌</span>Slot capacity: 200 people max</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>🪔 <span>Ganesh Festival ECS</span> &copy; 2024 — Ganapati Bappa Morya! 🙏</p>
+</footer>
+
+<script src="../js/api.js"></script>
+<script>
+let selectedSlot = 'Morning';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    setupNavbar();
+    // Set min date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('pass-date').min = today;
+    document.getElementById('pass-date').value = today;
+    await loadMandals();
+});
+
+async function loadMandals() {
+    try {
+        const data = await apiFetch('/mandals');
+        const sel = document.getElementById('pass-mandal');
+        sel.innerHTML = '<option value="">-- Select Mandal --</option>';
+        data.mandals.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.id; opt.textContent = m.name;
+            sel.appendChild(opt);
+        });
+    } catch(e) {}
+}
+
+function selectSlot(el) {
+    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSlot = el.dataset.slot;
+}
+
+async function bookPass() {
+    const name   = document.getElementById('pass-name').value.trim();
+    const email  = document.getElementById('pass-email').value.trim();
+    const phone  = document.getElementById('pass-phone').value.trim();
+    const mandal = document.getElementById('pass-mandal').value;
+    const date   = document.getElementById('pass-date').value;
+    const people = document.getElementById('pass-people').value;
+
+    if (!name || !email || !phone || !mandal || !date) {
+        return showAlert('alert-container', 'Please fill all required fields.', 'error');
+    }
+
+    const btn = document.getElementById('btn-book');
+    btn.disabled = true; btn.textContent = '⏳ Booking...';
+
+    try {
+        const data = await apiFetch('/passes', {
+            method: 'POST',
+            body: JSON.stringify({
+                holder_name:  name,
+                holder_email: email,
+                holder_phone: phone,
+                mandal_id:    mandal,
+                pass_date:    date,
+                pass_slot:    selectedSlot,
+                num_people:   parseInt(people)
+            })
+        });
+        showPassCard(data.pass);
+    } catch(e) {
+        showAlert('alert-container', e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '🎟️ Book Free Darshan Pass';
+    }
+}
+
+function showPassCard(pass) {
+    document.getElementById('booking-form').style.display = 'none';
+    const displayEl = document.getElementById('pass-display');
+    displayEl.style.display = 'block';
+
+    // Build QR-like display (using CSS pattern since no QR library)
+    displayEl.innerHTML = `
+        <div style="margin-bottom:20px">
+            <div class="alert alert-success">🎉 ${pass.holder_name}, your Darshan Pass is confirmed!</div>
+        </div>
+        <div class="pass-card" id="printable-pass">
+            <div class="pass-card-header">
+                <div>
+                    <div class="pass-card-title">ॐ Ganapati Darshan Pass</div>
+                    <div class="pass-card-subtitle">Ganesh Festival Event Coordination System</div>
+                </div>
+                <div class="pass-number-badge">${pass.pass_number}</div>
+            </div>
+            <hr class="pass-divider">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div class="pass-detail">
+                    <div class="pass-detail-label">Pass Holder</div>
+                    <div class="pass-detail-value">${pass.holder_name}</div>
+                </div>
+                <div class="pass-detail">
+                    <div class="pass-detail-label">Phone</div>
+                    <div class="pass-detail-value">${pass.holder_phone}</div>
+                </div>
+                <div class="pass-detail">
+                    <div class="pass-detail-label">Darshan Date</div>
+                    <div class="pass-detail-value">${formatDate(pass.pass_date)}</div>
+                </div>
+                <div class="pass-detail">
+                    <div class="pass-detail-label">Time Slot</div>
+                    <div class="pass-detail-value">${pass.pass_slot}</div>
+                </div>
+                <div class="pass-detail">
+                    <div class="pass-detail-label">No. of People</div>
+                    <div class="pass-detail-value">${pass.num_people} Person(s)</div>
+                </div>
+                <div class="pass-detail">
+                    <div class="pass-detail-label">Status</div>
+                    <div class="pass-detail-value"><span class="pass-status-active">✓ ACTIVE</span></div>
+                </div>
+            </div>
+            <div class="pass-qr-box">
+                <div style="font-size:0.65rem;color:#888;margin-bottom:6px">SCAN AT ENTRANCE</div>
+                <div style="background:#f5f5f5;padding:12px;border-radius:6px;font-family:monospace;font-size:0.7rem;color:#333;word-break:break-all;text-align:left">
+                    ${pass.pass_number} | ${pass.holder_name} | ${formatDate(pass.pass_date)} | ${pass.pass_slot} | ${pass.num_people}p
+                </div>
+                <div class="pass-qr-text">${pass.pass_number}</div>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print Pass</button>
+            <button class="btn btn-secondary" onclick="bookAnother()">+ Book Another</button>
+        </div>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:10px">
+            📌 Save this pass number: <strong>${pass.pass_number}</strong> — you can look it up anytime below.
+        </p>
+    `;
+}
+
+function bookAnother() {
+    document.getElementById('booking-form').style.display = 'block';
+    document.getElementById('pass-display').style.display = 'none';
+    document.getElementById('btn-book').disabled = false;
+    document.getElementById('btn-book').textContent = '🎟️ Book Free Darshan Pass';
+    document.getElementById('pass-name').value = '';
+    document.getElementById('pass-email').value = '';
+    document.getElementById('pass-phone').value = '';
+}
+
+async function lookupPass() {
+    const email  = document.getElementById('lookup-email').value.trim();
+    const passno = document.getElementById('lookup-passno').value.trim();
+    if (!email && !passno) return;
+
+    const resultsEl = document.getElementById('lookup-results');
+    resultsEl.innerHTML = '<div class="spinner" style="width:24px;height:24px;margin:10px 0"></div>';
+
+    try {
+        const params = passno ? `pass_number=${encodeURIComponent(passno)}` : `email=${encodeURIComponent(email)}`;
+        const data = await apiFetch(`/passes/lookup?${params}`);
+        resultsEl.innerHTML = data.passes.map(p => `
+            <div style="background:white;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <strong style="font-family:monospace;color:var(--maroon)">${p.pass_number}</strong>
+                    <span class="pass-status-${p.status}">${p.status.toUpperCase()}</span>
+                </div>
+                <div style="font-size:0.82rem;color:var(--text-mid)">
+                    👤 ${p.holder_name} &nbsp;·&nbsp; 📅 ${formatDate(p.pass_date)} &nbsp;·&nbsp;
+                    ⏰ ${p.pass_slot} &nbsp;·&nbsp; 👥 ${p.num_people} people<br>
+                    🏛️ ${p.mandal_name || 'N/A'}
+                </div>
+            </div>
+        `).join('');
+    } catch(e) {
+        resultsEl.innerHTML = `<p class="alert alert-error">No passes found. Check your email or pass number.</p>`;
+    }
+}
+</script>
+</body>
+</html>

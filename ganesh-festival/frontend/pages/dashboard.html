@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Ganesh Festival ECS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand"><span class="om">ॐ</span> Ganesh Festival ECS</a>
+        <div class="nav-toggle"><span></span><span></span><span></span></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="mandals.html">Mandals</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="donate.html">Donate</a></li>
+            <li><a href="donations.html">Donations</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="contact_us.html">Contact us</a></li>
+        </ul>
+        <div class="nav-auth">
+            <div id="nav-guest" style="display:none">
+                <button class="btn-nav-login" onclick="location.href='login.html'">Login</button>
+            </div>
+            <div id="nav-user-info" style="display:none">
+                <span id="nav-username"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button id="btn-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title"><span class="icon">🏠</span> My Dashboard</h1>
+        <div>
+            <span id="welcome-msg" style="color:var(--text-mid)"></span>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="dashboard-grid" id="dash-stats">
+        <div class="dash-card">
+            <div class="dash-icon" style="background:#FFF0E0">🏛️</div>
+            <div class="dash-info">
+                <h3 id="d-mandals">—</h3>
+                <p>Total Mandals</p>
+            </div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-icon" style="background:#E8F5E9">🎭</div>
+            <div class="dash-info">
+                <h3 id="d-events">—</h3>
+                <p>Total Events</p>
+            </div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-icon" style="background:#FFF8CC">📢</div>
+            <div class="dash-info">
+                <h3 id="d-announcements">—</h3>
+                <p>Announcements</p>
+            </div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-icon" style="background:#F8D7DA">🚨</div>
+            <div class="dash-info">
+                <h3 id="d-complaints">—</h3>
+                <p>My Complaints</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" id="dash-panels">
+        <!-- Announcements Panel -->
+        <div class="section-panel">
+            <div class="section-panel-header">
+                <h3>📢 Announcements</h3>
+            </div>
+            <div class="section-panel-body" id="dash-announcements">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- My Complaints Panel -->
+        <div class="section-panel">
+            <div class="section-panel-header">
+                <h3>🚨 My Complaints</h3>
+                <button class="btn btn-primary btn-sm" onclick="openModal('modal-complaint')">+ New</button>
+            </div>
+            <div class="section-panel-body" id="dash-complaints">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Volunteer Registration (for users) -->
+    <div class="section-panel" id="volunteer-panel" style="margin-top:24px;display:none">
+        <div class="section-panel-header">
+            <h3>🤝 Become a Volunteer</h3>
+        </div>
+        <div class="section-panel-body">
+            <p style="color:var(--text-mid);margin-bottom:16px">Join our volunteer team and help make the festival a success!</p>
+            <div id="modal-vol-alert"></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Preferred Mandal</label>
+                    <select id="vol-mandal"></select>
+                </div>
+                <div class="form-group">
+                    <label>Availability</label>
+                    <select id="vol-avail">
+                        <option>Morning Shift (6AM-12PM)</option>
+                        <option>Afternoon Shift (12PM-6PM)</option>
+                        <option>Evening Shift (6PM-12AM)</option>
+                        <option>Full Day</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Your Skills</label>
+                <textarea id="vol-skills" rows="2" placeholder="e.g. Decoration, Cooking, Security, Music, Photography..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="registerVolunteer()">🙋 Register as Volunteer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Complaint Modal -->
+<div class="modal-overlay" id="modal-complaint">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Submit a Complaint</h3>
+            <button class="modal-close" onclick="closeModal('modal-complaint')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="complaint-alert"></div>
+            <div class="form-group">
+                <label>Subject *</label>
+                <input type="text" id="complaint-subject" placeholder="Brief description of the issue">
+            </div>
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea id="complaint-desc" rows="4" placeholder="Describe the issue in detail..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-complaint')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitComplaint()">📨 Submit</button>
+        </div>
+    </div>
+</div>
+
+<footer><p>🪔 <span>Ganesh Festival ECS</span> &copy; 2026</p></footer>
+
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!requireAuth()) return;
+    setupNavbar();
+
+    const user = Auth.getUser();
+    document.getElementById('welcome-msg').textContent = `Welcome back, ${user.name}! 🙏`;
+
+    if (user.role === 'user') {
+        document.getElementById('volunteer-panel').style.display = 'block';
+    }
+
+    if (window.innerWidth < 768) {
+        document.getElementById('dash-panels').style.gridTemplateColumns = '1fr';
+    }
+
+    await Promise.all([loadDashData(), loadMandals()]);
+});
+
+async function loadDashData() {
+    try {
+        const [mandals, events, announcements, complaints] = await Promise.all([
+            apiFetch('/mandals'),
+            apiFetch('/events'),
+            apiFetch('/announcements'),
+            apiFetch('/complaints')
+        ]);
+
+        document.getElementById('d-mandals').textContent       = mandals.mandals.length;
+        document.getElementById('d-events').textContent        = events.events.length;
+        document.getElementById('d-announcements').textContent = announcements.announcements.length;
+        document.getElementById('d-complaints').textContent    = complaints.complaints.length;
+
+        // Announcements
+        const annEl = document.getElementById('dash-announcements');
+        if (announcements.announcements.length) {
+            annEl.innerHTML = announcements.announcements.slice(0, 5).map(a => `
+                <div class="announcement-card ${a.priority}" style="margin-bottom:12px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                        <h4 style="font-size:0.9rem">${a.title}</h4>
+                        ${getBadgeHTML(a.priority)}
+                    </div>
+                    <p style="font-size:0.85rem">${a.content}</p>
+                    <div class="ann-meta">${formatDate(a.created_at)}</div>
+                </div>
+            `).join('');
+        } else annEl.innerHTML = '<p style="color:var(--text-light)">No announcements yet.</p>';
+
+        // Complaints
+        const cmpEl = document.getElementById('dash-complaints');
+        if (complaints.complaints.length) {
+            cmpEl.innerHTML = complaints.complaints.map(c => `
+                <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <strong style="font-size:0.9rem">${c.subject}</strong>
+                        ${getBadgeHTML(c.status.replace('_',' '), c.status)}
+                    </div>
+                    <p style="font-size:0.82rem;color:var(--text-light);margin-top:4px">${formatDate(c.created_at)}</p>
+                    ${c.admin_response ? `<p style="font-size:0.82rem;color:var(--green);margin-top:4px">📩 ${c.admin_response}</p>` : ''}
+                </div>
+            `).join('');
+        } else cmpEl.innerHTML = '<p style="color:var(--text-light)">No complaints submitted.</p>';
+
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+async function loadMandals() {
+    try {
+        const data = await apiFetch('/mandals');
+        const sel = document.getElementById('vol-mandal');
+        sel.innerHTML = '<option value="">-- Select Mandal --</option>' +
+            data.mandals.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+    } catch(e) {}
+}
+
+async function submitComplaint() {
+    const body = {
+        subject:     document.getElementById('complaint-subject').value.trim(),
+        description: document.getElementById('complaint-desc').value.trim()
+    };
+    if (!body.subject || !body.description) return showAlert('complaint-alert', 'Both fields are required.', 'error');
+    try {
+        await apiFetch('/complaints', { method: 'POST', body: JSON.stringify(body) });
+        closeModal('modal-complaint');
+        showAlert('alert-container' ,'✅ Complaint submitted successfully.');
+        await loadDashData();
+    } catch(e) { showAlert('complaint-alert', e.message, 'error'); }
+}
+
+async function registerVolunteer() {
+    const body = {
+        mandal_id:    document.getElementById('vol-mandal').value || null,
+        skills:       document.getElementById('vol-skills').value.trim(),
+        availability: document.getElementById('vol-avail').value
+    };
+    try {
+        await apiFetch('/volunteers/register', { method: 'POST', body: JSON.stringify(body) });
+        document.getElementById('volunteer-panel').innerHTML =
+            '<div class="section-panel-body"><p class="alert alert-success">🎉 You are now registered as a volunteer! Please log in again to see updated role.</p></div>';
+    } catch(e) { showAlert('modal-vol-alert', e.message, 'error'); }
+}
+</script>
+</body>
+</html>

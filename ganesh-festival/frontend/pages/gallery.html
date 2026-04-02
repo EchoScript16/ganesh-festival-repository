@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery — Ganesh Festival ECS</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .gallery-upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: white;
+            margin-bottom: 24px;
+        }
+        .gallery-upload-zone:hover { border-color: var(--saffron); background: #FFF8ED; }
+        .gallery-upload-zone .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .gallery-item { position: relative; overflow: hidden; }
+        .gallery-item .overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .gallery-item:hover .overlay { opacity: 1; }
+        /* Lightbox */
+        #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; }
+        #lightbox.active { display: flex; }
+        #lightbox img { max-width: 90vw; max-height: 85vh; border-radius: 8px; }
+        #lightbox-close { position: absolute; top: 20px; right: 24px; font-size: 2rem; color: white; cursor: pointer; }
+        .prev, .next {
+    position: absolute;
+    top: 50%;
+    font-size: 40px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.prev { left: 30px; }
+.next { right: 30px; }
+
+.gallery-grid img {
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.gallery-grid img:hover {
+    transform: scale(1.05);
+}
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand"><span class="om">ॐ</span> Ganesh Festival ECS</a>
+        <div class="nav-toggle"><span></span><span></span><span></span></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="mandals.html">Mandals</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="donate.html">Donate</a></li>
+            <li><a href="donations.html">Donations</a></li>
+            <li><a href="gallery.html" class="active">Gallery</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="contact_us.html">Contact us</a></li>
+        </ul>
+        <div class="nav-auth">
+            <div id="nav-guest" style="display:none">
+                <button class="btn-nav-login" onclick="location.href='login.html'">Login</button>
+            </div>
+            <div id="nav-user-info" style="display:none">
+                <span id="nav-username"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button id="btn-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title"><span class="icon">🖼️</span> Festival Gallery</h1>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <!-- Upload Zone (volunteers/admin only) -->
+    <div id="upload-section" style="display:none">
+        <div class="gallery-upload-zone" id="upload-zone">
+            <div class="upload-icon">📁</div>
+            <p style="font-weight:600;color:var(--maroon)">Click or drag to upload images/videos</p>
+            <p style="font-size:0.82rem;color:var(--text-light)">Supports JPEG, PNG, GIF, MP4, MOV (Max 10MB)</p>
+            <input type="file" id="file-input" accept="image/*,video/*" style="display:none">
+        </div>
+        <div id="upload-form-section" style="display:none;background:white;border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:24px">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="media-title" placeholder="Photo/video title">
+                </div>
+                <div class="form-group">
+                    <label>Mandal</label>
+                    <select id="media-mandal"></select>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px">
+                <button class="btn btn-primary" onclick="uploadMedia()">📤 Upload</button>
+                <button class="btn btn-secondary" onclick="cancelUpload()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;align-items:center">
+        <span style="color:var(--text-light);font-size:0.85rem">Filter:</span>
+        <button class="btn btn-primary btn-sm filter-btn active" data-type="all">All</button>
+        <button class="btn btn-secondary btn-sm filter-btn" data-type="image">📷 Images</button>
+        <button class="btn btn-secondary btn-sm filter-btn" data-type="video">🎥 Videos</button>
+    </div>
+
+    
+<div class="gallery-section">
+
+  <!-- 1 -->
+  <h2 class="ganpati-title">Dagdusheth Ganpati</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/dagdusheth1.jpg">
+    <img src="../images/gallery/dagdusheth2.jpg">
+    <img src="../images/gallery/dagdusheth3.jpg">
+    <img src="../images/gallery/dagdusheth4.jpg">
+    <img src="../images/gallery/dagdusheth5.jpg">
+    <img src="../images/gallery/dagdusheth6.jpg">
+    <img src="../images/gallery/dagdusheth7.jpg">
+    <img src="../images/gallery/dagdusheth8.jpg">
+    <img src="../images/gallery/dagdusheth9.jpg">
+    <img src="../images/gallery/dagdusheth10.jpg">
+  </div>
+
+  <!-- 2 -->
+  <h2 class="ganpati-title">Kasaba Ganpati</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/kasaba1.jpg">
+    <img src="../images/gallery/kasaba2.jpg">
+    <img src="../images/gallery/kasaba3.jpg">
+    <img src="../images/gallery/kasaba4.jpg">
+    <img src="../images/gallery/kasaba5.jpg">
+    <img src="../images/gallery/kasaba6.jpg">
+    <img src="../images/gallery/kasaba7.jpg">
+    <img src="../images/gallery/kasaba8.jpg">
+    <img src="../images/gallery/kasaba9.jpg">
+    <img src="../images/gallery/kasaba10.jpg">
+  </div>
+
+  <!-- 3 -->
+  <h2 class="ganpati-title">Tambdi Jogeshwari Ganpati</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/tambdi1.jpg">
+    <img src="../images/gallery/tambdi2.jpg">
+    <img src="../images/gallery/tambdi3.jpg">
+    <img src="../images/gallery/tambdi4.jpg">
+    <img src="../images/gallery/tambdi5.jpg">
+    <img src="../images/gallery/tambdi6.jpg">
+    <img src="../images/gallery/tambdi7.jpg">
+    <img src="../images/gallery/tambdi8.jpg">
+    <img src="../images/gallery/tambdi9.jpg">
+    <img src="../images/gallery/tambdi10.jpg">
+  </div>
+
+  <!-- 4 -->
+  <h2 class="ganpati-title">Guruji Talim Ganpati</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/guruji1.jpg">
+    <img src="../images/gallery/guruji2.jpg">
+    <img src="../images/gallery/guruji3.jpg">
+    <img src="../images/gallery/guruji4.jpg">
+    <img src="../images/gallery/guruji5.jpg">
+    <img src="../images/gallery/guruji6.jpg">
+    <img src="../images/gallery/guruji7.jpg">
+    <img src="../images/gallery/guruji8.jpg">
+    <img src="../images/gallery/guruji9.jpg">
+    <img src="../images/gallery/guruji10.jpg">
+  </div>
+
+  <!-- 5 -->
+  <h2 class="ganpati-title">Tulshibaug Ganpati</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/tulshi1.jpg">
+    <img src="../images/gallery/tulshi2.jpg">
+    <img src="../images/gallery/tulshi3.jpg">
+    <img src="../images/gallery/tulshi4.jpg">
+    <img src="../images/gallery/tulshi5.jpg">
+    <img src="../images/gallery/tulshi6.jpg">
+    <img src="../images/gallery/tulshi7.jpg">
+    <img src="../images/gallery/tulshi8.jpg">
+    <img src="../images/gallery/tulshi9.jpg">
+    <img src="../images/gallery/tulshi10.jpg">
+  </div>
+
+  <!-- 6 -->
+  <h2 class="ganpati-title">Kesariwada Ganapti</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/kesari1.jpg">
+    <img src="../images/gallery/kesari2.jpg">
+    <img src="../images/gallery/kesari3.jpg">
+    <img src="../images/gallery/kesari4.jpg">
+    <img src="../images/gallery/kesari5.jpg">
+    <img src="../images/gallery/kesari6.jpg">
+    <img src="../images/gallery/kesari7.jpg">
+    <img src="../images/gallery/kesari8.jpg">
+    <img src="../images/gallery/kesari9.jpg">
+    <img src="../images/gallery/kesari10.jpg">
+  </div>
+
+  <!-- 7 -->
+  <h2 class="ganpati-title">Bhausaheb Rangari</h2>
+  <div class="gallery-grid">
+    <img src="../images/gallery/rangari1.jpg">
+    <img src="../images/gallery/rangari2.jpg">
+    <img src="../images/gallery/rangari3.jpg">
+    <img src="../images/gallery/rangari4.jpg">
+    <img src="../images/gallery/rangari5.jpg">
+    <img src="../images/gallery/rangari6.jpg">
+    <img src="../images/gallery/rangari7.jpg">
+    <img src="../images/gallery/rangari8.jpg">
+    <img src="../images/gallery/rangari9.jpg">
+    <img src="../images/gallery/rangari10.jpg">
+  </div>
+
+</div>
+<p id="no-video-msg" style="
+    display:none;
+    text-align:center;
+    font-size:18px;
+    color:#8B0000;
+    margin-top:30px;
+">
+    🎥 No videos uploaded yet
+</p>
+
+<!-- Lightbox -->
+<div id="lightbox">
+    <span id="lightbox-close" onclick="closeLightbox()">✕</span>
+
+    <button class="prev" onclick="changeImage(-1)">❮</button>
+    <img id="lightbox-img">
+    <button class="next" onclick="changeImage(1)">❯</button>
+</div>
+
+<footer><p>🪔 <span>Ganesh Festival ECS</span> &copy; 2026</p></footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    let currentImages = [];
+    let currentIndex = 0;
+
+    document.querySelectorAll('.gallery-grid').forEach(grid => {
+        const imgs = grid.querySelectorAll('img');
+
+        imgs.forEach((img, index) => {
+            img.addEventListener('click', () => {
+                currentImages = Array.from(imgs).map(i => i.src);
+                currentIndex = index;
+
+                document.getElementById('lightbox-img').src = currentImages[currentIndex];
+                document.getElementById('lightbox').classList.add('active');
+            });
+        });
+    });
+
+    window.changeImage = function(step) {
+        currentIndex += step;
+
+        if (currentIndex < 0) currentIndex = currentImages.length - 1;
+        if (currentIndex >= currentImages.length) currentIndex = 0;
+
+        document.getElementById('lightbox-img').src = currentImages[currentIndex];
+    }
+
+    window.closeLightbox = function() {
+        document.getElementById('lightbox').classList.remove('active');
+    }
+    document.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") changeImage(1);
+    if (e.key === "ArrowLeft") changeImage(-1);
+    if (e.key === "Escape") closeLightbox();
+});
+
+});
+// FILTER BUTTON LOGIC
+const filterButtons = document.querySelectorAll('.filter-btn');
+const gallerySection = document.querySelector('.gallery-section');
+
+filterButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+
+        // remove active from all
+        filterButtons.forEach(b => b.classList.remove('active'));
+
+        // add active to clicked
+        btn.classList.add('active');
+
+        const type = btn.getAttribute('data-type');
+
+        if (type === "all") {
+            gallerySection.style.display = "block";
+            document.getElementById("no-video-msg").style.display = "none";
+        }
+
+        else if (type === "image") {
+            gallerySection.style.display = "block";
+            document.getElementById("no-video-msg").style.display = "none";
+        }
+
+        else if (type === "video") {
+            gallerySection.style.display = "none";
+            document.getElementById("no-video-msg").style.display = "block";
+        }
+    });
+});
+</script>
+
+</body>
+</html>

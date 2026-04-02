@@ -1,0 +1,21 @@
+# Dependencies
+backend/node_modules/
+
+# Environment variables (never commit these!)
+backend/.env
+
+# Uploaded media files
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/

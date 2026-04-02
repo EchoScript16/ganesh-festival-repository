@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events — Ganesh Festival ECS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand"><span class="om">ॐ</span> Ganesh Festival ECS</a>
+        <div class="nav-toggle"><span></span><span></span><span></span></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="mandals.html">Mandals</a></li>
+            <li><a href="events.html" class="active">Events</a></li>
+            <li><a href="donate.html">Donate</a></li>
+            <li><a href="donations.html">Donations</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="contact_us.html">Contact us</a></li>
+            
+        </ul>
+        <div class="nav-auth">
+            <div id="nav-guest" style="display:none">
+                <button class="btn-nav-login" onclick="location.href='login.html'">Login</button>
+                <button class="btn-nav-register" onclick="location.href='register.html'">Register</button>
+            </div>
+            <div id="nav-user-info" style="display:none">
+                <span id="nav-username"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button id="btn-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title"><span class="icon">🎭</span> Festival Events</h1>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <select id="filter-type" class="form-group" style="margin:0">
+                <option value="">All Types</option>
+                <option value="aarti">Aarti</option>
+                <option value="competition">Competition</option>
+                <option value="cultural">Cultural</option>
+                <option value="other">Other</option>
+            </select>
+            <div id="staff-actions" style="display:none">
+                <button class="btn btn-primary" onclick="openAddEvent()">➕ Add Event</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alert-container"></div>
+    <div class="cards-grid" id="events-list">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal-overlay" id="modal-event">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-title">Add New Event</h3>
+            <button class="modal-close" onclick="closeModal('modal-event')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-alert"></div>
+            <input type="hidden" id="event-id">
+            <div class="form-group">
+                <label>Event Title *</label>
+                <input type="text" id="event-title" placeholder="e.g. Morning Aarti Ceremony">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Type</label>
+                    <select id="event-type">
+                        <option value="aarti">Aarti</option>
+                        <option value="competition">Competition</option>
+                        <option value="cultural">Cultural</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mandal</label>
+                    <select id="event-mandal"></select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date & Time *</label>
+                    <input type="datetime-local" id="event-date">
+                </div>
+                <div class="form-group">
+                    <label>Max Participants</label>
+                    <input type="number" id="event-max" value="100" min="1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="event-location" placeholder="Venue address">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="event-desc" rows="3" placeholder="Event details..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-event')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveEvent()">💾 Save Event</button>
+        </div>
+    </div>
+</div>
+
+<footer><p>🪔 <span>Ganesh Festival ECS</span> &copy; 2026</p></footer>
+
+<script src="../js/api.js"></script>
+<script>
+let events = [], mandals = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    setupNavbar();
+    if (Auth.isVolunteer()) document.getElementById('staff-actions').style.display = 'flex';
+    await Promise.all([loadEvents(), loadMandals()]);
+    document.getElementById('filter-type').addEventListener('change', renderEvents);
+});
+
+async function loadEvents() {
+    showLoading('events-list');
+    try {
+        const data = await apiFetch('/events');
+        events = data.events;
+        renderEvents();
+    } catch(e) {
+        document.getElementById('events-list').innerHTML = '<p class="alert alert-error">Failed to load events.</p>';
+    }
+}
+
+async function loadMandals() {
+    try {
+        const data = await apiFetch('/mandals');
+        mandals = data.mandals;
+        const sel = document.getElementById('event-mandal');
+        sel.innerHTML = '<option value="">-- Select Mandal --</option>' +
+            mandals.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+    } catch(e) {}
+}
+
+function renderEvents() {
+    const filter = document.getElementById('filter-type').value;
+    const filtered = filter ? events.filter(e => e.type === filter) : events;
+    const el = document.getElementById('events-list');
+    if (!filtered.length) return showEmpty('events-list', 'No events found.');
+
+    el.innerHTML = filtered.map(ev => {
+        const isFull = parseInt(ev.registered_count) >= ev.max_participants;
+        const pct = Math.min(100, Math.round((ev.registered_count / ev.max_participants) * 100));
+        return `
+        <div class="card">
+            <div class="card-header">
+                <h3>${ev.title}</h3>
+                <div class="card-meta">${getBadgeHTML(ev.type || 'other', ev.type)}</div>
+            </div>
+            <div class="card-body">
+                <p>📅 <strong>${formatDateTime(ev.event_date)}</strong></p>
+                <p>📍 ${ev.location || 'TBA'}</p>
+                <p>🏛️ ${ev.mandal_name || 'General'}</p>
+                <p style="margin-top:8px;font-size:0.85rem">${ev.description || ''}</p>
+                <div style="margin-top:12px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--text-light);margin-bottom:4px">
+                        <span>👥 ${ev.registered_count}/${ev.max_participants} registered</span>
+                        <span>${pct}%</span>
+                    </div>
+                    <div style="height:6px;background:var(--border);border-radius:3px">
+                        <div style="width:${pct}%;height:100%;background:${isFull ? 'var(--red)' : 'var(--green)'};border-radius:3px;transition:width 0.5s"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                ${Auth.isLoggedIn() && !isFull
+                    ? `<button class="btn btn-primary btn-sm" onclick="registerEvent(${ev.id})">✅ Register</button>`
+                    : isFull
+                        ? `<span class="badge badge-urgent">Fully Booked</span>`
+                        : `<button class="btn btn-secondary btn-sm" onclick="location.href='login.html'">Login to Register</button>`
+                }
+                ${Auth.isVolunteer() ? `
+                    <button class="btn btn-secondary btn-sm" onclick="editEvent(${ev.id})">✏️</button>
+                    ${Auth.isAdmin() ? `<button class="btn btn-danger btn-sm" onclick="deleteEvent(${ev.id})">🗑️</button>` : ''}
+                ` : ''}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function registerEvent(id) {
+    if (!requireAuth()) return;
+    try {
+        await apiFetch(`/events/${id}/register`, { method: 'POST' });
+        showAlert('alert-container', '🎉 Successfully registered for the event!');
+        await loadEvents();
+    } catch(e) {
+        showAlert('alert-container', e.message, 'error');
+    }
+}
+
+function openAddEvent() {
+    document.getElementById('event-id').value = '';
+    document.getElementById('event-title').value = '';
+    document.getElementById('event-desc').value = '';
+    document.getElementById('event-location').value = '';
+    document.getElementById('modal-title').textContent = 'Add New Event';
+    openModal('modal-event');
+}
+
+function editEvent(id) {
+    const ev = events.find(x => x.id === id);
+    if (!ev) return;
+    document.getElementById('event-id').value       = ev.id;
+    document.getElementById('event-title').value    = ev.title;
+    document.getElementById('event-type').value     = ev.type;
+    document.getElementById('event-mandal').value   = ev.mandal_id || '';
+    document.getElementById('event-date').value     = ev.event_date?.slice(0,16);
+    document.getElementById('event-max').value      = ev.max_participants;
+    document.getElementById('event-location').value = ev.location || '';
+    document.getElementById('event-desc').value     = ev.description || '';
+    document.getElementById('modal-title').textContent = 'Edit Event';
+    openModal('modal-event');
+}
+
+async function saveEvent() {
+    const id = document.getElementById('event-id').value;
+    const body = {
+        title:            document.getElementById('event-title').value.trim(),
+        type:             document.getElementById('event-type').value,
+        mandal_id:        document.getElementById('event-mandal').value || null,
+        event_date:       document.getElementById('event-date').value,
+        max_participants: document.getElementById('event-max').value,
+        location:         document.getElementById('event-location').value.trim(),
+        description:      document.getElementById('event-desc').value.trim()
+    };
+    if (!body.title || !body.event_date) return showAlert('modal-alert', 'Title and date are required.', 'error');
+    try {
+        if (id) {
+            await apiFetch(`/events/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+        } else {
+            await apiFetch('/events', { method: 'POST', body: JSON.stringify(body) });
+        }
+        closeModal('modal-event');
+        showAlert('alert-container', 'Event saved successfully!');
+        await loadEvents();
+    } catch(e) { showAlert('modal-alert', e.message, 'error'); }
+}
+
+async function deleteEvent(id) {
+    if (!confirm('Delete this event?')) return;
+    try {
+        await apiFetch(`/events/${id}`, { method: 'DELETE' });
+        showAlert('alert-container', 'Event deleted.');
+        await loadEvents();
+    } catch(e) { showAlert('alert-container', e.message, 'error'); }
+}
+</script>
+</body>
+</html>

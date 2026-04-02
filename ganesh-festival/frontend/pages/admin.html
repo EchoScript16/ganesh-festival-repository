@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — Ganesh Festival ECS</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand"><span class="om">ॐ</span> Ganesh Festival ECS</a>
+        <div class="nav-toggle"><span></span><span></span><span></span></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="mandals.html">Mandals</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="donations.html">Donations</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="admin.html" class="active">Admin</a></li>
+        </ul>
+        <div class="nav-auth">
+            <div id="nav-user-info" style="display:none">
+                <span id="nav-username"></span>
+                <span id="nav-role" class="role-badge"></span>
+                <button id="btn-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-container">
+    <div class="page-header">
+        <h1 class="page-title"><span class="icon">⚙️</span> Admin Control Panel</h1>
+        <span class="badge badge-admin">Admin Only</span>
+    </div>
+
+    <!-- Admin Stats -->
+    <div class="stats-bar" id="admin-stats">
+        <div class="stat-card"><div class="stat-num" id="as-users">—</div><div class="stat-label">Total Users</div></div>
+        <div class="stat-card"><div class="stat-num" id="as-mandals">—</div><div class="stat-label">Mandals</div></div>
+        <div class="stat-card"><div class="stat-num" id="as-events">—</div><div class="stat-label">Events</div></div>
+        <div class="stat-card"><div class="stat-num" id="as-volunteers">—</div><div class="stat-label">Volunteers</div></div>
+        <div class="stat-card"><div class="stat-num" id="as-donations">—</div><div class="stat-label">Revenue</div></div>
+        <div class="stat-card"><div class="stat-num" id="as-complaints">—</div><div class="stat-label">Open Complaints</div></div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div style="display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap">
+        <button class="btn btn-primary tab-btn" data-tab="complaints">🚨 Complaints</button>
+        <button class="btn btn-secondary tab-btn" data-tab="announcements">📢 Announcements</button>
+        <button class="btn btn-secondary tab-btn" data-tab="volunteers">🤝 Volunteers</button>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <!-- Complaints Tab -->
+    <div class="tab-panel" id="tab-complaints">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>User</th><th>Subject</th><th>Status</th><th>Date</th><th>Action</th></tr>
+                </thead>
+                <tbody id="complaints-body">
+                    <tr><td colspan="6" style="text-align:center;padding:30px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Announcements Tab -->
+    <div class="tab-panel" id="tab-announcements" style="display:none">
+        <div style="margin-bottom:16px;text-align:right">
+            <button class="btn btn-primary" onclick="openModal('modal-announcement')">➕ New Announcement</button>
+        </div>
+        <div id="announcements-list"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Volunteers Tab -->
+    <div class="tab-panel" id="tab-volunteers" style="display:none">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Mandal</th><th>Skills</th><th>Shift</th><th>Task</th><th>Action</th></tr>
+                </thead>
+                <tbody id="volunteers-body">
+                    <tr><td colspan="7" style="text-align:center;padding:30px"><div class="spinner" style="margin:0 auto"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Resolve Complaint Modal -->
+<div class="modal-overlay" id="modal-resolve">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Resolve Complaint</h3>
+            <button class="modal-close" onclick="closeModal('modal-resolve')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="resolve-alert"></div>
+            <input type="hidden" id="resolve-id">
+            <p style="margin-bottom:12px;font-size:0.9rem;color:var(--text-mid)" id="resolve-subject"></p>
+            <div class="form-group">
+                <label>Update Status</label>
+                <select id="resolve-status">
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Admin Response</label>
+                <textarea id="resolve-response" rows="3" placeholder="Response to user..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-resolve')">Cancel</button>
+            <button class="btn btn-success" onclick="saveResolve()">✅ Update Complaint</button>
+        </div>
+    </div>
+</div>
+
+<!-- Announcement Modal -->
+<div class="modal-overlay" id="modal-announcement">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Post Announcement</h3>
+            <button class="modal-close" onclick="closeModal('modal-announcement')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="ann-alert"></div>
+            <div class="form-group">
+                <label>Title *</label>
+                <input type="text" id="ann-title" placeholder="Announcement heading">
+            </div>
+            <div class="form-group">
+                <label>Priority</label>
+                <select id="ann-priority">
+                    <option value="low">Low</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Content *</label>
+                <textarea id="ann-content" rows="4" placeholder="Announcement details..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-announcement')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAnnouncement()">📢 Post</button>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Task Modal -->
+<div class="modal-overlay" id="modal-assign">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Assign Task to Volunteer</h3>
+            <button class="modal-close" onclick="closeModal('modal-assign')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="assign-alert"></div>
+            <input type="hidden" id="assign-vol-id">
+            <p style="margin-bottom:12px;font-size:0.9rem;color:var(--text-mid)" id="assign-vol-name"></p>
+            <div class="form-group">
+                <label>Assign Task</label>
+                <input type="text" id="assign-task" placeholder="e.g. Stage Setup, Crowd Management">
+            </div>
+            <div class="form-group">
+                <label>Shift</label>
+                <select id="assign-shift">
+                    <option>Morning (6AM-12PM)</option>
+                    <option>Afternoon (12PM-6PM)</option>
+                    <option>Evening (6PM-12AM)</option>
+                    <option>Full Day</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-assign')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAssign()">💾 Assign</button>
+        </div>
+    </div>
+</div>
+
+<footer><p>🪔 <span>Ganesh Festival ECS</span> &copy; 2024</p></footer>
+
+<script src="../js/api.js"></script>
+<script>
+let complaints = [], volunteers = [], announcements = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!requireAdmin()) return;
+    setupNavbar();
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.className = 'btn btn-secondary tab-btn';
+            });
+            btn.className = 'btn btn-primary tab-btn';
+            document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+            document.getElementById(`tab-${btn.dataset.tab}`).style.display = 'block';
+        });
+    });
+
+    await loadAll();
+});
+
+async function loadAll() {
+    try {
+        const [m, e, v, d, a, c] = await Promise.all([
+            apiFetch('/mandals'), apiFetch('/events'), apiFetch('/volunteers'),
+            apiFetch('/donations'), apiFetch('/announcements'), apiFetch('/complaints')
+        ]);
+
+        document.getElementById('as-mandals').textContent   = m.mandals.length;
+        document.getElementById('as-events').textContent    = e.events.length;
+        document.getElementById('as-volunteers').textContent = v.volunteers.length;
+        document.getElementById('as-donations').textContent = formatCurrency(d.stats?.total || 0);
+        document.getElementById('as-complaints').textContent = c.complaints.filter(x => x.status !== 'resolved').length;
+        document.getElementById('as-users').textContent     = '—';
+
+        complaints    = c.complaints;
+        volunteers    = v.volunteers;
+        announcements = a.announcements;
+
+        renderComplaints();
+        renderAnnouncements();
+        renderVolunteers();
+    } catch(e) {
+        showAlert('alert-container', 'Failed to load admin data: ' + e.message, 'error');
+    }
+}
+
+function renderComplaints() {
+    const tbody = document.getElementById('complaints-body');
+    if (!complaints.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-light)">No complaints.</td></tr>'; return; }
+    tbody.innerHTML = complaints.map(c => `
+        <tr>
+            <td>#${c.id}</td>
+            <td>${c.user_name || 'Anonymous'}<br><small style="color:var(--text-light)">${c.user_email || ''}</small></td>
+            <td>${c.subject}</td>
+            <td>${getBadgeHTML(c.status.replace('_',' '), c.status)}</td>
+            <td>${formatDate(c.created_at)}</td>
+            <td><button class="btn btn-primary btn-sm" onclick="openResolve(${c.id})">Respond</button></td>
+        </tr>
+    `).join('');
+}
+
+function openResolve(id) {
+    const c = complaints.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('resolve-id').value        = c.id;
+    document.getElementById('resolve-subject').textContent = `📝 "${c.subject}"`;
+    document.getElementById('resolve-status').value    = c.status;
+    document.getElementById('resolve-response').value  = c.admin_response || '';
+    openModal('modal-resolve');
+}
+
+async function saveResolve() {
+    const id = document.getElementById('resolve-id').value;
+    const body = {
+        status:         document.getElementById('resolve-status').value,
+        admin_response: document.getElementById('resolve-response').value.trim()
+    };
+    try {
+        await apiFetch(`/complaints/${id}/resolve`, { method: 'PUT', body: JSON.stringify(body) });
+        closeModal('modal-resolve');
+        showAlert('alert-container', '✅ Complaint updated!');
+        await loadAll();
+    } catch(e) { showAlert('resolve-alert', e.message, 'error'); }
+}
+
+function renderAnnouncements() {
+    const el = document.getElementById('announcements-list');
+    if (!announcements.length) { el.innerHTML = '<p style="color:var(--text-light)">No announcements posted.</p>'; return; }
+    el.innerHTML = announcements.map(a => `
+        <div class="announcement-card ${a.priority}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                        <h4>${a.title}</h4>
+                        ${getBadgeHTML(a.priority)}
+                    </div>
+                    <p>${a.content}</p>
+                    <div class="ann-meta">📅 ${formatDate(a.created_at)} · By ${a.posted_by_name || 'Admin'}</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="deleteAnn(${a.id})" style="margin-left:16px;flex-shrink:0">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function saveAnnouncement() {
+    const body = {
+        title:    document.getElementById('ann-title').value.trim(),
+        content:  document.getElementById('ann-content').value.trim(),
+        priority: document.getElementById('ann-priority').value
+    };
+    if (!body.title || !body.content) return showAlert('ann-alert', 'Title and content required.', 'error');
+    try {
+        await apiFetch('/announcements', { method: 'POST', body: JSON.stringify(body) });
+        closeModal('modal-announcement');
+        showAlert('alert-container', '📢 Announcement posted!');
+        await loadAll();
+    } catch(e) { showAlert('ann-alert', e.message, 'error'); }
+}
+
+async function deleteAnn(id) {
+    if (!confirm('Delete this announcement?')) return;
+    try {
+        await apiFetch(`/announcements/${id}`, { method: 'DELETE' });
+        showAlert('alert-container', 'Announcement deleted.');
+        await loadAll();
+    } catch(e) { showAlert('alert-container', e.message, 'error'); }
+}
+
+function renderVolunteers() {
+    const tbody = document.getElementById('volunteers-body');
+    if (!volunteers.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-light)">No volunteers registered.</td></tr>'; return; }
+    tbody.innerHTML = volunteers.map(v => `
+        <tr>
+            <td><strong>${v.name}</strong></td>
+            <td>${v.email}</td>
+            <td>${v.mandal_name || '—'}</td>
+            <td style="font-size:0.82rem">${v.skills || '—'}</td>
+            <td>${v.shift || '—'}</td>
+            <td style="font-size:0.82rem">${v.assigned_task || 'Not assigned'}</td>
+            <td><button class="btn btn-primary btn-sm" onclick="openAssign(${v.id}, '${v.name}')">Assign Task</button></td>
+        </tr>
+    `).join('');
+}
+
+function openAssign(id, name) {
+    document.getElementById('assign-vol-id').value = id;
+    document.getElementById('assign-vol-name').textContent = `👤 ${name}`;
+    openModal('modal-assign');
+}
+
+async function saveAssign() {
+    const id = document.getElementById('assign-vol-id').value;
+    const body = {
+        assigned_task: document.getElementById('assign-task').value.trim(),
+        shift:         document.getElementById('assign-shift').value
+    };
+    try {
+        await apiFetch(`/volunteers/${id}/assign`, { method: 'PUT', body: JSON.stringify(body) });
+        closeModal('modal-assign');
+        showAlert('alert-container', '✅ Task assigned!');
+        await loadAll();
+    } catch(e) { showAlert('assign-alert', e.message, 'error'); }
+}
+</script>
+</body>
+</html>

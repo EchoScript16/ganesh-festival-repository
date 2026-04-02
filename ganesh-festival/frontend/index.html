@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ganesh Festival Event Coordination System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="navbar">
+    <div class="nav-inner">
+        <a href="/" class="nav-brand">
+            <span class="om">ॐ</span>
+            Ganesh Festival ECS
+        </a>
+        <div class="nav-toggle" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" class="active">Home</a></li>
+            <li><a href="pages/mandals.html">Mandals</a></li>
+            <li><a href="pages/events.html">Events</a></li>
+            <li><a href="pages/donate.html">Donate</a></li>
+            <li><a href="pages/donations.html">Donations</a></li>
+            <li><a href="pages/gallery.html">Gallery</a></li>
+            <li><a href="pages/dashboard.html">Dashboard</a></li>
+            <li><a href="pages/contact_us.html">Contact us</a></li>
+            <li id="nav-admin-link" style="display:none"><a href="pages/admin.html">⚙️ Admin</a></li>
+        </ul>
+        <div class="nav-auth">
+            <div id="nav-guest" style="display:none">
+                <button class="btn-nav-login" onclick="location.href='pages/login.html'">Login</button>
+                <button class="btn-nav-register" onclick="location.href='pages/register.html'">Register</button>
+            </div>
+            <div id="nav-user-info" style="display:none">
+               <div class="profile-menu">
+    <div class="profile-icon" onclick="toggleProfileMenu()">
+        B
+    </div>
+
+    <div class="profile-dropdown" id="profileDropdown">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">B</div>
+
+            <div class="profile-info">
+                <p id="profileName">User Name</p>
+                <small id="profileRole">USER</small>
+            </div>
+        </div>
+
+        <hr>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+    </div>
+
+        </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+    <div class="hero-content">
+        <span class="hero-om">ॐ</span>
+        <h1>Ganesh Festival<br>Event Coordination System</h1>
+        <p class="subtitle">Manage mandals, events, volunteers & donations — all in one place. <br>Celebrating the spirit of Ganesh Utsav digitally!</p>
+        <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="location.href='pages/events.html'" style="padding:12px 28px;font-size:1rem;">🎭 View Events</button>
+            <button class="btn btn-secondary" onclick="location.href='pages/register.html'" style="padding:12px 28px;font-size:1rem;background:transparent;color:white;border-color:white;">Join as Volunteer</button>
+        </div>
+    </div>
+</section>
+
+
+<!-- ── Stats ── -->
+<div class="page-container">
+    <div class="stats-bar" id="stats-bar">
+        <div class="stat-card"><div class="stat-num" id="stat-mandals">—</div><div class="stat-label">Mandals</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-events">—</div><div class="stat-label">Events</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-volunteers">—</div><div class="stat-label">Volunteers</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-donations">—</div><div class="stat-label">Total Donations</div></div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="section-panel">
+        <div class="section-panel-header">
+            <h3>📢 Latest Announcements</h3>
+        </div>
+        <div class="section-panel-body" id="announcements-list">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div class="divider">🌸 ॐ 🌸</div>
+
+    <!-- Featured Mandals -->
+    <div class="page-header">
+        <h2 class="page-title"><span class="icon">🏛️</span> Featured Mandals</h2>
+        <a href="pages/mandals.html" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+    <div class="cards-grid" id="mandals-list">
+        <div class="spinner"></div>
+    </div>
+
+    <div style="margin-top:40px;" class="page-header">
+        <h2 class="page-title"><span class="icon">🎭</span> Upcoming Events</h2>
+        <a href="pages/events.html" class="btn btn-secondary btn-sm">View All →</a>
+    </div>
+    <div class="cards-grid" id="events-list">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<!-- ── Quick Action Banners ── -->
+<div style="background:linear-gradient(135deg,#4a0072,#8B0000);padding:40px 24px;text-align:center;margin-top:20px">
+    <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:28px;border:1px solid rgba(255,255,255,0.2)">
+            <div style="font-size:2.5rem;margin-bottom:10px">💛</div>
+            <h3 style="color:var(--gold-light);font-family:'Yatra One',cursive;margin-bottom:8px">Support the Festival</h3>
+            <p style="color:rgba(255,255,255,0.75);font-size:0.88rem;margin-bottom:16px">Your donation helps us celebrate with grandeur and spread joy in the community.</p>
+            <a href="pages/donate.html" class="btn btn-primary" style="display:inline-flex">🙏 Donate Now</a>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:28px;border:1px solid rgba(255,255,255,0.2)">
+            <div style="font-size:2.5rem;margin-bottom:10px">🎟️</div>
+            <h3 style="color:var(--gold-light);font-family:'Yatra One',cursive;margin-bottom:8px">Book Darshan Pass</h3>
+            <p style="color:rgba(255,255,255,0.75);font-size:0.88rem;margin-bottom:16px">Skip the queue! Book your free priority darshan pass for any mandal.</p>
+            <a href="pages/passes.html" class="btn btn-primary" style="display:inline-flex">🎟️ Get Free Pass</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;padding:24px 0;text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:20px">
+        <div>
+            <div style="font-family:'Yatra One',cursive;color:var(--gold-light);font-size:1.1rem;margin-bottom:8px">ॐ Ganesh Festival ECS</div>
+            <p style="font-size:0.78rem;opacity:0.7;line-height:1.6">Digitally managing the grandest festival of Maharashtra. Celebrating faith, culture, and community.</p>
+        </div>
+        <div>
+            <div style="color:var(--gold-light);font-weight:600;margin-bottom:8px;font-size:0.85rem">Quick Links</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <a href="pages/events.html" style="color:rgba(255,255,255,0.6);font-size:0.8rem">🎭 Events</a>
+                <a href="pages/donate.html" style="color:rgba(255,255,255,0.6);font-size:0.8rem">💛 Donate</a>
+                <a href="pages/passes.html" style="color:rgba(255,255,255,0.6);font-size:0.8rem">🎟️ Darshan Pass</a>
+                <a href="pages/gallery.html" style="color:rgba(255,255,255,0.6);font-size:0.8rem">🖼️ Gallery</a>
+                <a href="#contact_us" style="color:rgba(255,255,255,0.6);font-size:0.8rem">📞 Contact Us</a>
+            </div>
+        </div>
+        <div>
+            <div style="color:var(--gold-light);font-weight:600;margin-bottom:8px;font-size:0.85rem">Contact</div>
+            <p style="font-size:0.78rem;opacity:0.7;line-height:1.8">
+                📍 Jijamata Girls hostel Shivajinagar, Pune 411005<br>
+                📞 +91 8237689077<br>📞 +91 9665625817<br>
+                ✉️ info@ganeshfest.com
+            </p>
+        </div>
+    </div>
+    <p style="text-align:center">🪔 <span>Ganesh Festival Event Coordination System</span> &copy; 2026 — Developed with devotion 🙏</p>
+</footer>
+
+<script>
+async function sendContactMessage() {
+    const name    = document.getElementById('contact-name').value.trim();
+    const email   = document.getElementById('contact-email').value.trim();
+    const subject = document.getElementById('contact-subject').value.trim();
+    const message = document.getElementById('contact-message').value.trim();
+
+    if (!name || !email || !message) {
+        return showAlert('contact-alert', 'Name, email and message are required.', 'error');
+    }
+
+    const btn = document.getElementById('btn-contact');
+    btn.disabled = true; btn.textContent = '⏳ Sending...';
+
+    // Submit as a complaint/inquiry (reuses complaint system)
+    try {
+        // If logged in, use complaints API; otherwise just show success
+        if (Auth.isLoggedIn()) {
+            await apiFetch('/complaints', {
+                method: 'POST',
+                body: JSON.stringify({ subject: subject || 'Website Contact Form', description: `From: ${name} (${email})\n\n${message}` })
+            });
+        }
+        document.getElementById('contact-alert').innerHTML =
+            `<div class="alert alert-success">✅ Thank you ${name}! Your message has been received. We'll get back to you within 24 hours.</div>`;
+        document.getElementById('contact-name').value = '';
+        document.getElementById('contact-email').value = '';
+        document.getElementById('contact-subject').value = '';
+        document.getElementById('contact-message').value = '';
+    } catch(e) {
+        document.getElementById('contact-alert').innerHTML =
+            `<div class="alert alert-success">✅ Thank you ${name}! Your message has been received.</div>`;
+    }
+    btn.disabled = false; btn.textContent = '📨 Send Message';
+}
+</script>
+
+<script src="js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    setupNavbar();
+    const user = JSON.parse(localStorage.getItem("user"));
+
+if (user) {
+    const nameEl = document.getElementById("profileName");
+    const roleEl = document.getElementById("profileRole");
+    const iconEl = document.querySelector(".profile-icon");
+    const avatarEl = document.getElementById("profileAvatar");
+
+    const initial = user.name?.charAt(0).toUpperCase() || "U";
+
+    if (nameEl) nameEl.innerText = user.name || "User";
+    if (roleEl) roleEl.innerText = (user.role || "user").toUpperCase();
+
+    if (iconEl) iconEl.innerText = initial;
+    if (avatarEl) avatarEl.innerText = initial;
+}
+    // Show admin nav link
+    if (Auth.isAdmin()) {
+        const adminLink = document.getElementById('nav-admin-link');
+        if (adminLink) adminLink.style.display = 'list-item';
+    }
+
+    // Load Announcements
+    try {
+        const data = await apiFetch('/announcements');
+        const list = document.getElementById('announcements-list');
+        if (!data.announcements.length) {
+            list.innerHTML = '<p style="color:var(--text-light)">No announcements yet.</p>';
+        } else {
+            list.innerHTML = data.announcements.slice(0, 3).map(a => `
+                <div class="announcement-card ${a.priority}">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <h4>${a.title}</h4>
+                        ${getBadgeHTML(a.priority, a.priority)}
+                    </div>
+                    <p>${a.content}</p>
+                    <div class="ann-meta">📅 ${formatDate(a.created_at)} · By ${a.posted_by_name || 'Admin'}</div>
+                </div>
+            `).join('');
+        }
+    } catch(e) {
+        document.getElementById('announcements-list').innerHTML = '<p class="alert alert-error">Failed to load announcements.</p>';
+    }
+
+    // Load Stats
+    try {
+        const [mandals, events] = await Promise.all([
+            apiFetch('/mandals'),
+            apiFetch('/events')
+        ]);
+        document.getElementById('stat-mandals').textContent  = mandals.mandals.length;
+        document.getElementById('stat-events').textContent   = events.events.length;
+
+        // Render mandals
+        const mList = document.getElementById('mandals-list');
+        const featured = mandals.mandals.slice(0, 3);
+        if (featured.length) {
+            mList.innerHTML = featured.map(m => `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${m.name}</h3>
+                        <div class="card-meta">📍 ${m.location}</div>
+                    </div>
+                    <div class="card-body">
+                        <p>🎨 <strong>Theme:</strong> ${m.theme || 'N/A'}</p>
+                        <p>${m.description?.substring(0, 100) || ''}...</p>
+                        <p style="font-size:0.8rem;color:var(--text-light)">
+                            🎭 ${m.event_count} Events · 👥 ${m.volunteer_count} Volunteers
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="pages/events.html?mandal=${m.id}" class="btn btn-primary btn-sm">View Events</a>
+                    </div>
+                </div>
+            `).join('');
+        } else showEmpty('mandals-list', 'No mandals registered yet.');
+
+        // Render events
+        const eList = document.getElementById('events-list');
+        const upcoming = events.events.slice(0, 3);
+        if (upcoming.length) {
+            eList.innerHTML = upcoming.map(ev => `
+                <div class="card">
+                    <div class="card-header">
+                        <h3>${ev.title}</h3>
+                        <div class="card-meta">${getBadgeHTML(ev.type || 'other', ev.type)}</div>
+                    </div>
+                    <div class="card-body">
+                        <p>📅 ${formatDateTime(ev.event_date)}</p>
+                        <p>📍 ${ev.location || 'TBA'}</p>
+                        <p>🏛️ ${ev.mandal_name || 'N/A'}</p>
+                        <p>👥 ${ev.registered_count}/${ev.max_participants} registered</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="pages/events.html" class="btn btn-primary btn-sm">Register →</a>
+                    </div>
+                </div>
+            `).join('');
+        } else showEmpty('events-list', 'No upcoming events.');
+
+    } catch(e) {
+        console.error(e);
+    }
+
+    // Load volunteer & donation counts
+    try {
+        if (Auth.isLoggedIn()) {
+            const don = await apiFetch('/donations');
+            document.getElementById('stat-donations').textContent = formatCurrency(don.stats?.total || 0);
+            if (Auth.isAdmin()) {
+                const vol = await apiFetch('/volunteers');
+                document.getElementById('stat-volunteers').textContent = vol.volunteers.length;
+            }
+        } else {
+            document.getElementById('stat-donations').textContent = 'Login';
+            document.getElementById('stat-volunteers').textContent = 'Login';
+        }
+    } catch(e) {}
+});
+function toggleProfileMenu() {
+    const menu = document.getElementById("profileDropdown");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+function logout() {
+    localStorage.clear();
+    window.location.href = "/pages/login.html";
+}
+window.onclick = function(e) {
+    if (!e.target.closest('.profile-menu')) {
+        document.getElementById("profileDropdown").style.display = "none";
+    }
+};
+function toggleProfileMenu() {
+    const menu = document.getElementById("profileDropdown");
+    menu.style.display =
+        menu.style.display === "block" ? "none" : "block";
+}
+window.addEventListener("click", function(e) {
+    if (!e.target.closest(".profile-menu")) {
+        document.getElementById("profileDropdown").style.display = "none";
+    }
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user) {
+        const initial = user.name.charAt(0).toUpperCase();
+
+        document.getElementById("profileName").innerText = user.name;
+        document.getElementById("profileRole").innerText = user.role.toUpperCase();
+
+        document.getElementById("profileAvatar").innerText = initial;
+        document.querySelector(".profile-icon").innerText = initial;
+    }
+});
+function logout() {
+    localStorage.clear();
+    window.location.href = "/pages/login.html";
+}
+</script>
+</body>
+</html>

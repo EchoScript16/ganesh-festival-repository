@@ -1,0 +1,347 @@
+{
+  "info": {
+    "name": "Ganesh Festival ECS - API Collection",
+    "description": "Complete API test collection for the Ganesh Festival Event Coordination System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000/api" },
+    { "key": "token",    "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Test@123\",\n  \"role\": \"user\",\n  \"phone\": \"9876500000\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as Admin",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const json = pm.response.json();",
+                "if (json.token) { pm.collectionVariables.set('token', json.token); }",
+                "pm.test('Login successful', () => pm.response.to.have.status(200));"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@ganeshfest.com\",\n  \"password\": \"Admin@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as Volunteer",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahul@example.com\",\n  \"password\": \"Admin@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏛️ Mandals",
+      "item": [
+        {
+          "name": "Get All Mandals",
+          "request": { "method": "GET", "url": "{{base_url}}/mandals" }
+        },
+        {
+          "name": "Get Mandal By ID",
+          "request": { "method": "GET", "url": "{{base_url}}/mandals/1" }
+        },
+        {
+          "name": "Create Mandal (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/mandals",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Test Mandal\",\n  \"location\": \"Pune City Center\",\n  \"theme\": \"Swachh Bharat\",\n  \"description\": \"A new mandal promoting cleanliness.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Mandal (Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/mandals/1",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kasba Ganesh Mandal (Updated)\",\n  \"location\": \"Kasba Peth, Pune\",\n  \"theme\": \"Green Ganesh 2024\",\n  \"description\": \"Updated description for Kasba Mandal.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Mandal (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/mandals/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎭 Events",
+      "item": [
+        {
+          "name": "Get All Events",
+          "request": { "method": "GET", "url": "{{base_url}}/events" }
+        },
+        {
+          "name": "Get Event By ID",
+          "request": { "method": "GET", "url": "{{base_url}}/events/1" }
+        },
+        {
+          "name": "Create Event (Admin/Volunteer)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/events",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mandal_id\": 1,\n  \"title\": \"Evening Aarti Special\",\n  \"type\": \"aarti\",\n  \"description\": \"Special evening aarti with 108 diyas.\",\n  \"event_date\": \"2024-09-15T18:00:00\",\n  \"location\": \"Main Mandap\",\n  \"max_participants\": 200\n}"
+            }
+          }
+        },
+        {
+          "name": "Register for Event",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/events/1/register",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Delete Event (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/events/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Donations",
+      "item": [
+        {
+          "name": "Get All Donations",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/donations",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Add Donation (Admin/Volunteer)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/donations",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"donor_name\": \"Ramesh Patil\",\n  \"donor_email\": \"ramesh@example.com\",\n  \"donor_phone\": \"9900112233\",\n  \"amount\": 7500,\n  \"mandal_id\": 1,\n  \"purpose\": \"Idol Decoration\",\n  \"payment_mode\": \"upi\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Donation (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/donations/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤝 Volunteers",
+      "item": [
+        {
+          "name": "Get All Volunteers (Admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/volunteers",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Register as Volunteer",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/volunteers/register",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mandal_id\": 1,\n  \"skills\": \"Photography, Event Management\",\n  \"availability\": \"Morning Shift (6AM-12PM)\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Assign Task to Volunteer (Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/volunteers/1/assign",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigned_task\": \"Stage Setup and Decoration\",\n  \"shift\": \"Morning (6AM-12PM)\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚨 Complaints",
+      "item": [
+        {
+          "name": "Get My Complaints",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/complaints",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Submit Complaint",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/complaints",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Noise Pollution After 11PM\",\n  \"description\": \"Loud music is being played beyond permitted hours near our area.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Resolve Complaint (Admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/complaints/1/resolve",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\",\n  \"admin_response\": \"We have spoken to the mandal committee. Music will stop at 10PM from now on.\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📢 Announcements",
+      "item": [
+        {
+          "name": "Get All Announcements",
+          "request": { "method": "GET", "url": "{{base_url}}/announcements" }
+        },
+        {
+          "name": "Create Announcement (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/announcements",
+            "header": [
+              { "key": "Content-Type",  "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Road Closure Notice\",\n  \"content\": \"Main Street will be closed from 6AM to 10PM on September 7th for the procession.\",\n  \"priority\": \"urgent\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Announcement (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/announcements/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🖼️ Media",
+      "item": [
+        {
+          "name": "Get All Media",
+          "request": { "method": "GET", "url": "{{base_url}}/media" }
+        },
+        {
+          "name": "Delete Media (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/media/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "❤️ Health Check",
+      "item": [
+        {
+          "name": "API Health",
+          "request": { "method": "GET", "url": "{{base_url}}/health" }
+        }
+      ]
+    }
+  ]
+}
