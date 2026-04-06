@@ -818,3 +818,34 @@ footer span { color: var(--gold); }
 body {
     top: 0 !important;
 }
+.lang-dropdown {
+    transition: all 0.2s ease;
+}
+.ticker {
+    width: 100%;
+    overflow: hidden;
+    background: #fa5f5f;
+    color: #fdfafb;
+    padding: 10px 0;
+    font-weight: bold;
+}
+
+.ticker-content {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: scrollText 15s linear infinite;
+}
+
+/* Animation */
+@keyframes scrollText {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+.ticker {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}

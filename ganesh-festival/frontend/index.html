@@ -10,6 +10,7 @@
 
 <!-- ── Navigation ── -->
 <nav class="navbar">
+    <div id="google_translate_element" style="display:none;"></div>
     <div class="nav-inner">
         <a href="/" class="nav-brand">
             <span class="om">ॐ</span>
@@ -19,8 +20,7 @@
             <span></span><span></span><span></span>
         </div>
         <ul class="nav-links">
-            <li><a href="/" data-en="Home" 
-data-mr="मुख्यपृष्ठ" class="active">Home</a></li>
+            <li><a href="/" class="active">Home</a></li>
             <li><a href="pages/mandals.html">Mandals</a></li>
             <li><a href="pages/events.html">Events</a></li>
             <li><a href="pages/donate.html">Donate</a></li>
@@ -31,13 +31,13 @@ data-mr="मुख्यपृष्ठ" class="active">Home</a></li>
             <li id="nav-admin-link" style="display:none"><a href="pages/admin.html">⚙️ Admin</a></li>
         </ul>
         <div class="nav-auth">
-            <div class="lang-menu">
+                <div class="lang-menu">
     <span class="lang-icon" onclick="toggleLangMenu()">🌐</span>
 
     <div class="lang-dropdown" id="langDropdown">
-        <div onclick="setLanguage('en')">English</div>
-        <div onclick="setLanguage('mr')">मराठी</div>
-        <div onclick="setLanguage('hi')">हिंदी</div>
+        <div onclick="changeLanguage('en')">English</div>
+        <div onclick="changeLanguage('mr')">मराठी</div>
+        <div onclick="changeLanguage('hi')">हिंदी</div>
     </div>
 </div>
             
@@ -72,19 +72,22 @@ data-mr="मुख्यपृष्ठ" class="active">Home</a></li>
         </div>
     </div>
 </nav>
+<div class="ticker">
+    <div class="ticker-content">
+        📢 Ganesh Festival 2026 starts on 14 Sept |
+        🪔 Maha Aarti on 18 Sept |
+        🎉 Cultural Events on 15 Sept |
+        🚩 Visarjan on 20 Sept |
+        🙏 Register for events now!
+    </div>
+</div>
 
 <!-- ── Hero ── -->
 <section class="hero">
     <div class="hero-content">
         <span class="hero-om">ॐ</span>
-        <h1 Gdata-en="Ganesh Festival Event Coordination System"
-data-mr="गणेश उत्सव समन्वय प्रणाली">
-Ganesh Festival Event Coordination System</h1>
-        <p class="subtitle"
-data-en="Manage mandals, events, volunteers & donations — all in one place."
-data-mr="मंडळे, कार्यक्रम, स्वयंसेवक आणि देणग्या एकाच ठिकाणी व्यवस्थापित करा.">
-Manage mandals, events, volunteers & donations — all in one place.
-<br>Celebrating the spirit of Ganesh Utsav digitally!</p>
+        <h1>Ganesh Festival Event Coordination System</h1>
+        <p class="subtitle"> Manage mandals, events, volunteers & donations — all in one place.<br>Celebrating the spirit of Ganesh Utsav digitally!</p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="location.href='pages/events.html'" style="padding:12px 28px;font-size:1rem;">🎭 View Events</button>
             <button class="btn btn-secondary" onclick="location.href='pages/register.html'" style="padding:12px 28px;font-size:1rem;background:transparent;color:white;border-color:white;">Join as Volunteer</button>
@@ -380,8 +383,6 @@ function logout() {
     window.location.href = "/pages/login.html";
 }
 </script>
-<div id="google_translate_element" style="display:none;"></div>
-
 <script>
 function googleTranslateElementInit() {
     new google.translate.TranslateElement({
@@ -394,7 +395,12 @@ function googleTranslateElementInit() {
 
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
-function setLanguage(lang) {
+function toggleLangMenu() {
+    const menu = document.getElementById("langDropdown");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+function changeLanguage(lang) {
     localStorage.setItem("lang", lang);
 
     let interval = setInterval(() => {
@@ -409,13 +415,25 @@ function setLanguage(lang) {
 
     document.getElementById("langDropdown").style.display = "none";
 }
-</script>
-<script>
+
+// Load saved language
 window.addEventListener("load", () => {
-    const lang = localStorage.getItem("lang");
-    if (lang) setLanguage(lang);
+    setTimeout(() => {
+        const lang = localStorage.getItem("lang");
+        if (lang) changeLanguage(lang);
+    }, 1000);
 });
 </script>
+<script>
+// Close dropdown when clicking outside
+window.addEventListener("click", function(e) {
+    const menu = document.getElementById("langDropdown");
 
+    // if click is NOT inside lang-menu
+    if (!e.target.closest(".lang-menu")) {
+        if (menu) menu.style.display = "none";
+    }
+});
+</script>
 </body>
 </html>
