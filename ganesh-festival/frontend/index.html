@@ -10,6 +10,7 @@
 
 <!-- ── Navigation ── -->
 <nav class="navbar">
+    <div id="google_translate_element" style="display:none;"></div>
     <div class="nav-inner">
         <a href="/" class="nav-brand">
             <span class="om">ॐ</span>
@@ -30,6 +31,16 @@
             <li id="nav-admin-link" style="display:none"><a href="pages/admin.html">⚙️ Admin</a></li>
         </ul>
         <div class="nav-auth">
+                <div class="lang-menu">
+    <span class="lang-icon" onclick="toggleLangMenu()">🌐</span>
+
+    <div class="lang-dropdown" id="langDropdown">
+        <div onclick="changeLanguage('en')">English</div>
+        <div onclick="changeLanguage('mr')">मराठी</div>
+        <div onclick="changeLanguage('hi')">हिंदी</div>
+    </div>
+</div>
+            
             <div id="nav-guest" style="display:none">
                 <button class="btn-nav-login" onclick="location.href='pages/login.html'">Login</button>
                 <button class="btn-nav-register" onclick="location.href='pages/register.html'">Register</button>
@@ -61,13 +72,22 @@
         </div>
     </div>
 </nav>
+<div class="ticker">
+    <div class="ticker-content">
+        📢 Ganesh Festival 2026 starts on 14 Sept |
+        🪔 Maha Aarti on 18 Sept |
+        🎉 Cultural Events on 15 Sept |
+        🚩 Visarjan on 20 Sept |
+        🙏 Register for events now!
+    </div>
+</div>
 
 <!-- ── Hero ── -->
 <section class="hero">
     <div class="hero-content">
         <span class="hero-om">ॐ</span>
-        <h1>Ganesh Festival<br>Event Coordination System</h1>
-        <p class="subtitle">Manage mandals, events, volunteers & donations — all in one place. <br>Celebrating the spirit of Ganesh Utsav digitally!</p>
+        <h1>Ganesh Festival Event Coordination System</h1>
+        <p class="subtitle"> Manage mandals, events, volunteers & donations — all in one place.<br>Celebrating the spirit of Ganesh Utsav digitally!</p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="location.href='pages/events.html'" style="padding:12px 28px;font-size:1rem;">🎭 View Events</button>
             <button class="btn btn-secondary" onclick="location.href='pages/register.html'" style="padding:12px 28px;font-size:1rem;background:transparent;color:white;border-color:white;">Join as Volunteer</button>
@@ -362,6 +382,58 @@ function logout() {
     localStorage.clear();
     window.location.href = "/pages/login.html";
 }
+</script>
+<script>
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,mr,hi',
+        autoDisplay: false
+    }, 'google_translate_element');
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+function toggleLangMenu() {
+    const menu = document.getElementById("langDropdown");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+function changeLanguage(lang) {
+    localStorage.setItem("lang", lang);
+
+    let interval = setInterval(() => {
+        const select = document.querySelector(".goog-te-combo");
+
+        if (select) {
+            select.value = lang;
+            select.dispatchEvent(new Event("change"));
+            clearInterval(interval);
+        }
+    }, 300);
+
+    document.getElementById("langDropdown").style.display = "none";
+}
+
+// Load saved language
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        const lang = localStorage.getItem("lang");
+        if (lang) changeLanguage(lang);
+    }, 1000);
+});
+</script>
+<script>
+// Close dropdown when clicking outside
+window.addEventListener("click", function(e) {
+    const menu = document.getElementById("langDropdown");
+
+    // if click is NOT inside lang-menu
+    if (!e.target.closest(".lang-menu")) {
+        if (menu) menu.style.display = "none";
+    }
+});
 </script>
 </body>
 </html>
