@@ -19,7 +19,8 @@
             <span></span><span></span><span></span>
         </div>
         <ul class="nav-links">
-            <li><a href="/" class="active">Home</a></li>
+            <li><a href="/" data-en="Home" 
+data-mr="मुख्यपृष्ठ" class="active">Home</a></li>
             <li><a href="pages/mandals.html">Mandals</a></li>
             <li><a href="pages/events.html">Events</a></li>
             <li><a href="pages/donate.html">Donate</a></li>
@@ -30,6 +31,16 @@
             <li id="nav-admin-link" style="display:none"><a href="pages/admin.html">⚙️ Admin</a></li>
         </ul>
         <div class="nav-auth">
+            <div class="lang-menu">
+    <span class="lang-icon" onclick="toggleLangMenu()">🌐</span>
+
+    <div class="lang-dropdown" id="langDropdown">
+        <div onclick="setLanguage('en')">English</div>
+        <div onclick="setLanguage('mr')">मराठी</div>
+        <div onclick="setLanguage('hi')">हिंदी</div>
+    </div>
+</div>
+            
             <div id="nav-guest" style="display:none">
                 <button class="btn-nav-login" onclick="location.href='pages/login.html'">Login</button>
                 <button class="btn-nav-register" onclick="location.href='pages/register.html'">Register</button>
@@ -66,8 +77,14 @@
 <section class="hero">
     <div class="hero-content">
         <span class="hero-om">ॐ</span>
-        <h1>Ganesh Festival<br>Event Coordination System</h1>
-        <p class="subtitle">Manage mandals, events, volunteers & donations — all in one place. <br>Celebrating the spirit of Ganesh Utsav digitally!</p>
+        <h1 Gdata-en="Ganesh Festival Event Coordination System"
+data-mr="गणेश उत्सव समन्वय प्रणाली">
+Ganesh Festival Event Coordination System</h1>
+        <p class="subtitle"
+data-en="Manage mandals, events, volunteers & donations — all in one place."
+data-mr="मंडळे, कार्यक्रम, स्वयंसेवक आणि देणग्या एकाच ठिकाणी व्यवस्थापित करा.">
+Manage mandals, events, volunteers & donations — all in one place.
+<br>Celebrating the spirit of Ganesh Utsav digitally!</p>
         <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="location.href='pages/events.html'" style="padding:12px 28px;font-size:1rem;">🎭 View Events</button>
             <button class="btn btn-secondary" onclick="location.href='pages/register.html'" style="padding:12px 28px;font-size:1rem;background:transparent;color:white;border-color:white;">Join as Volunteer</button>
@@ -363,5 +380,42 @@ function logout() {
     window.location.href = "/pages/login.html";
 }
 </script>
+<div id="google_translate_element" style="display:none;"></div>
+
+<script>
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,mr,hi',
+        autoDisplay: false
+    }, 'google_translate_element');
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script>
+function setLanguage(lang) {
+    localStorage.setItem("lang", lang);
+
+    let interval = setInterval(() => {
+        const select = document.querySelector(".goog-te-combo");
+
+        if (select) {
+            select.value = lang;
+            select.dispatchEvent(new Event("change"));
+            clearInterval(interval);
+        }
+    }, 300);
+
+    document.getElementById("langDropdown").style.display = "none";
+}
+</script>
+<script>
+window.addEventListener("load", () => {
+    const lang = localStorage.getItem("lang");
+    if (lang) setLanguage(lang);
+});
+</script>
+
 </body>
 </html>

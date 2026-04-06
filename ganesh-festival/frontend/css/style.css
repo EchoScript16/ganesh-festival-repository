@@ -775,3 +775,46 @@ footer span { color: var(--gold); }
     border-radius: 6px;
     cursor: pointer;
 }
+.lang-menu {
+    position: relative;
+}
+
+.lang-icon {
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Hidden initially */
+.lang-dropdown {
+    display: none;
+    position: absolute;
+    top: 35px;
+    right: 0;
+    background: white;
+    color: black;
+    border-radius: 8px;
+    min-width: 120px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.lang-dropdown div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.lang-dropdown div:hover {
+    background: #eee;
+}
+.goog-logo-link,
+.goog-te-gadget span {
+    display: none !important;
+}
+
+.goog-te-banner-frame {
+    display: none !important;
+}
+
+body {
+    top: 0 !important;
+}
