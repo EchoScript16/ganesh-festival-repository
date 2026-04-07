@@ -3,6 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const pool = require("./config/db");
+
+
+pool.connect()
+  .then(() => console.log("Database connected ✅"))
+  .catch(err => console.error("Database connection failed:", err));
 
 const app = express();
 const PORT = process.env.PORT || 5000;
