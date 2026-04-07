@@ -1,32 +1,40 @@
-// config/db.js - PostgreSQL Connection Pool (Supabase Ready)
+// config/db.js — Render Internal DB Connection
 
 const { Pool } = require('pg');
-require('dotenv').config();
 
-// Use DATABASE_URL from environment (Supabase)
+// Check env variable
+if (!process.env.DATABASE_URL) {
+    console.error("❌ DATABASE_URL is missing");
+    process.exit(1);
+}
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    },
+
+    // ❗ NO SSL for internal connection
+    ssl: false,
+
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 5000,
 });
 
-// Test connection
-pool.connect((err, client, release) => {
-    if (err) {
-        console.error('❌ Database connection failed:', err.message);
-    } else {
-        console.log('✅ PostgreSQL connected successfully');
-        release();
+// Test connection with retry
+const connectDB = async () => {
+    try {
+        const res = await pool.query('SELECT NOW()');
+        console.log('✅ DB connected:', res.rows[0].now);
+    } catch (err) {
+        console.error('❌ DB connection failed:', err.message);
+        setTimeout(connectDB, 5000);
     }
+};
+
+connectDB();
+
+// Handle pool errors
+pool.on('error', (err) => {
+    console.error('❌ Unexpected DB error:', err.message);
 });
-
-pool.query('SELECT NOW()')
-  .then(res => console.log("✅ DB Connected:", res.rows))
-  .catch(err => console.error("❌ DB Error:", err.message));
-
 
 module.exports = pool;
