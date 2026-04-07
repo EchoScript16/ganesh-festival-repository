@@ -24,4 +24,9 @@ pool.connect((err, client, release) => {
     }
 });
 
+pool.query('SELECT NOW()')
+  .then(res => console.log("✅ DB Connected:", res.rows))
+  .catch(err => console.error("❌ DB Error:", err.message));
+
+
 module.exports = pool;
